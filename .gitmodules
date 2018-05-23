@@ -1,0 +1,3 @@
+[submodule "totp-lib"]
+	path = totp-lib
+	url = https://github.com/mcaimi/python-otp-lib.git
