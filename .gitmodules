@@ -1,3 +1,6 @@
 [submodule "totp-lib"]
 	path = totp-lib
 	url = https://github.com/mcaimi/python-otp-lib.git
+[submodule "qrcode-lib"]
+	path = qrcode-lib
+	url = https://github.com/lincolnloop/python-qrcode.git
