@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+{% load i18n %}
+{% block title %}{% trans "TOTP Authentication Plugin" %}{% endblock %}
+
+{% block page_header %}
+  {% include "horizon/common/_domain_page_header.html" with title=page_title %}
+{% endblock page_header %}
+
+{% block main %}
+    {{ table.render }}
+    </p>
+    <div class="panel panel-info">
+      <div class="panel-heading">
+        <h3 class="panel-title">Openstack TOTP Plugin</h3>
+      </div>
+      <div class="panel-body">This page will lets you manage your TOTP Tokens. Make sure that every soft-token is synced with a <a href="http://www.pool.ntp.org/en/use.html">reliable time source!</a><p/>
+        Once the first soft-token has been successfully activated, if you want to add/activate another one, press the <b>"+ Display QRCode"</b> button on the top right of the page. Keep in mind that the undelying TOTP seed <i>remains the same</i> unless you deactivate and reactivate this feature for your user.</div>
+    </div>
+ 
+   {% if emailaddress == "MissingField" %}
+    <p/>
+    <div align="right">
+    <div class="panel panel-warning">
+      <div class="panel-heading">
+        <h3 class="panel-title">WARNING!</h3>
+      </div>
+      <div class="panel-body">You do not have an e-mail address configured. Please contact your Cloud Administrator. <p/>
+        To be sure that only you can link a security device to the current account, the cloud provider needs to know from you a valid e-mail address that is entitled to perform this activation step.<p/>
+        Once an email address has been provided, the feature will be automatically available to you.</a></div>
+    </div>
+    {% else %}
+    <div align="right" class="panel panel-warning" style="width:300px;">
+      <div class="panel-heading">Get the App!</div>
+      <div class="panel-body"><a href="https://play.google.com/store/apps/details?id=com.google.android.apps.authenticator2">
+      <img alt="Android app on Google Play" src="https://developer.android.com/images/brand/en_app_rgb_wo_45.png" />
+      </a>
+      <a href="https://itunes.apple.com/it/app/google-authenticator/id388497605?mt=8" style="display:inline-block;overflow:hidden;background:url(//linkmaker.itunes.apple.com/assets/shared/badges/en-us/appstore-lrg.svg) no-repeat;width:135px;height:40px;background-size:contain;vertical-align:middle;"></a>
+    </div>
+    </div>
+    </div>
+    <p/>
+ 
+    {% endif %}
+{% endblock %}
