@@ -1,0 +1,63 @@
+{% extends "horizon/common/_modal_form.html" %}
+{% load i18n %}
+
+{% block modal-header %}
+<h2>Activate Token</h2>
+{% if form.email_address.value != "MissingField" %}
+    <p/>
+    <p/><p/>
+    <div class="panel panel-info">
+      <div class="panel-heading">
+        <h3 class="panel-title">Activation - Step One</h3>
+      </div>
+      <div class="panel-body"><h4>An E-Mail has been sent here: "{{ form.email_address.value }}", with further instructions.</h4></div>
+    </div>
+    <p/>
+
+    <div class="panel panel-info">
+      <div class="panel-heading">
+        <h3 class="panel-title">Activation - Step Two</h3>
+      </div>
+      <div class="panel-body"><h4>Check your mail and scan the QRCode you'll find inside with Google Authenticator. Verify the code in the box below.</h4></div>
+    </div>
+    <p/>
+
+    <div class="panel panel-warning">
+      <div class="panel-heading">
+        <h3 class="panel-title">Attention!</h3>
+      </div>
+      <div class="panel-body"><h5>Allow a couple of minutes for the mail to be received by your ISP. If you have problems with authentication/verification, make sure your device time is synced with an NTP server and let 30 seconds pass before retrying.</h5></div>
+    </div>
+    <p/>
+
+{% else %}
+    <p/>
+    <div align="center"><span class="label label-info">Please scan this QRCode to begin setup.</span></div>
+    <p/>
+    <div align="center"><img src="{{ form.seed.value }}/qr"></div>
+    <p/>
+    <div class="panel panel-warning">
+      <div class="panel-heading">
+        <h3 class="panel-title">Attention!</h3>
+      </div>
+      <div class="panel-body"><h5>If you have problems with authentication/verification, make sure your device time is synced with an NTP server and let 30 seconds pass before retrying.</h5></div>
+    </div>
+    <p/>
+
+{% endif %}
+{% endblock %}
+
+{% block modal-body-right %}
+    <h3>{% trans "Token Validation Form" %}</h3>
+    <p>{% trans "Scan the QRCode with yout mobile authentication device (Google Authenticator is fine) and the verify the TOTP token." %}</p>
+    <p>{% trans "Once the token has been verified, TOTP Two Factor Authentication will be enabled for your user." %}</p>
+    <script type="text/javascript">
+        if (typeof horizon.user !== 'undefined') {
+            horizon.user.init();
+        } else {
+            addHorizonLoadEvent(function () {
+                horizon.user.init();
+            });
+        }
+    </script>
+{% endblock %}
