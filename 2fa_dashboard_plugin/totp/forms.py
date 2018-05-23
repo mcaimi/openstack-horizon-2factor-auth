@@ -49,7 +49,7 @@ class ActivateTwoFactorForm(forms.SelfHandlingForm):
             email = "MissingField"
         else:
             # send email...
-            send_activation_email(sender=getattr(settings, 'activation_email_address', 'activation@provider.tld'), recipient=email, subject=getattr(settings, 'activation_email_subject', 'TOTP Activation'), totp_token=v_seed, request=request)
+            send_activation_email(sender=getattr(settings, 'ACTIVATION_EMAIL_ADDRESS', 'activation@provider.tld'), recipient=email, subject=getattr(settings, 'ACTIVATION_EMAIL_SUBJECT', 'TOTP Activation'), totp_token=v_seed, request=request)
 
         self.fields['seed'].initial = v_seed
         self.fields['email_address'].initial = email
