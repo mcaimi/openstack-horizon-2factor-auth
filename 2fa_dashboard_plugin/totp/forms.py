@@ -45,7 +45,8 @@ class ActivateTwoFactorForm(forms.SelfHandlingForm):
             kwargs.get('initial', {})['seed'] = v_seed
 
         email = TOTPOracle(auth_url=get_auth_url(), token=request.user.token.id).user_get_email_address(request.user.id)
-        if (email == "None") or (email is None):
+
+        if (email == "") or (email == "None") or (email is None):
             email = "MissingField"
         else:
             # send email...
