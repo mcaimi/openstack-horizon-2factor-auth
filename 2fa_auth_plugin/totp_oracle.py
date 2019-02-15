@@ -15,7 +15,7 @@ from rfc6238 import totp
 from keystoneclient import session as ksc_session
 from keystoneclient.auth.identity import v3
 from keystoneclient.v3 import client as client_v3
-from keystoneclient.base import auth
+from keystoneclient import auth
 
 from exception import *
 
