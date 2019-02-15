@@ -82,6 +82,13 @@ set this parameters to change the authentication python class used by django:
 
   AUTHENTICATION_BACKENDS = ('openstack_auth.backend.KeystoneBackend',)
 
+
+with
+
+.. code:: python
+
+  AUTHENTICATION_BACKENDS =('openstack_dashboard.auth.backend.TwoFactorAuthBackend',)
+
 and in /etc/openstack-dashboard/local_settings:
 
 .. code:: python
