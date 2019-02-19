@@ -35,14 +35,14 @@ Using a disposable centos/redhat vm or container:
 
   # yum install -y rpm-build git python-setuptools
   # mkdir -p ~/rpmbuild/{SRPMS,RPMS,SOURCES,SPECS} && cd ~/rpmbuild
-  # git clone https://github.com/mcaimi/python-otp-lib.git python-otp-lib-mitaka
-  # tar cjvf SOURCES/python-otp-lib-mitaka.tar.gz python-otp-lib-mitaka
+  # git clone https://github.com/mcaimi/python-otp-lib.git python-otp-lib-queens
+  # tar cjvf SOURCES/python-otp-lib-queens.tar.gz python-otp-lib-queens
 
 Now, copy the SPEC file from this repo in `~/rpmbuild/SPECS` and build the RPM package:
 
 .. code:: bash
 
-  # rpmbuild -bb SPECS/python-otp-lib-mitaka.spec
+  # rpmbuild -bb SPECS/python-otp-lib-queens.spec
 
 Install prerequisites (totp-lib, python-qrcode)
 -----------------------------------------------
