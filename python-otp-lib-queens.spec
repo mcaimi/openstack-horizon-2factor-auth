@@ -8,7 +8,7 @@
 
 Summary: Python HMAC/HOTP/TOTP Library
 Name: python-otp-lib
-Version: mitaka
+Version: queens
 Release: 1
 License: GPL+
 Group: Development/Tools
@@ -59,6 +59,9 @@ rm -rf %{buildroot}
    /usr/lib/python2.7/site-packages/rfc6238/totp.pyc
 
 %changelog
+
+* Tue Feb 12 2019 Marco Caimi <marco.caimi> queens-1
+        - Update version string after testing on Openstack Queens (RDO Queens)
 
 * Tue Aug 01 2017 Marco Caimi <marco.caimi> mitaka-1
         - Initial Porting Completed, target Openstack Mitaka (RHOSP 9.0)
