@@ -44,7 +44,7 @@ class IndexView(tables.DataTableView):
     
     def get_context_data(self, **kwargs):
         context = super(IndexView, self).get_context_data(**kwargs)
-        manager = TOTPOracle(auth_url=get_auth_url(), token=self.request.user.token.id)
+        manager = TOTPOracle(auth_url=get_auth_url(), user_data=self.request.user)
         email_address = manager.user_get_email_address(self.request.user.id)
         if email_address == "None" or email_address is None:
                 context['emailaddress'] = "MissingField"
@@ -56,7 +56,7 @@ class IndexView(tables.DataTableView):
     def get_data(self):
         objects = []
         try:
-            manager = TOTPOracle(auth_url=get_auth_url(), token=self.request.user.token.id)
+            manager = TOTPOracle(auth_url=get_auth_url(), user_data=self.request.user)
             totp_key = manager.user_get_totp_key(self.request.user.id)
             email = manager.user_get_email_address(self.request.user.id)
             if (email == "None") or (email is None):

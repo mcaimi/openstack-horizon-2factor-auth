@@ -44,7 +44,7 @@ class ActivateTwoFactorForm(forms.SelfHandlingForm):
             v_seed = totp.get_random_base32_key(byte_key=16)
             kwargs.get('initial', {})['seed'] = v_seed
 
-        email = TOTPOracle(auth_url=get_auth_url(), token=request.user.token.id).user_get_email_address(request.user.id)
+        email = TOTPOracle(auth_url=get_auth_url(), user_data=request.user).user_get_email_address(request.user.id)
 
         if (email == "") or (email == "None") or (email is None):
             email = "MissingField"
@@ -61,7 +61,7 @@ class ActivateTwoFactorForm(forms.SelfHandlingForm):
             token_seed = data.get("seed")
             token_otp = data.get("token")
             #user_email = data.get("email_address")
-            twofactor = TOTPOracle(auth_url=get_auth_url(), token=user.token.id)
+            twofactor = TOTPOracle(auth_url=get_auth_url(), user_data=user)
             twofactor.enable(user.id, token_seed, token_otp)
             messages.success(request, _('[2FA]: Two Factor Auth successfully enabled.'))
         except:
@@ -80,11 +80,11 @@ class RegenerateTwoFactorForm(forms.SelfHandlingForm):
 
     def __init__(self, request, *args, **kwargs):
         super(RegenerateTwoFactorForm, self).__init__(request, *args, **kwargs)
-        v_seed = TOTPOracle(auth_url=get_auth_url(), token=request.user.token.id).user_get_totp_key(request.user.id)
+        v_seed = TOTPOracle(auth_url=get_auth_url(), user_data=request.user).user_get_totp_key(request.user.id)
         if not v_seed:
             return False
 
-        email = TOTPOracle(auth_url=get_auth_url(), token=request.user.token.id).user_get_email_address(request.user.id)
+        email = TOTPOracle(auth_url=get_auth_url(), user_data=request.user).user_get_email_address(request.user.id)
         if (email == "None") or (email is None):
             email = "MissingField"
 

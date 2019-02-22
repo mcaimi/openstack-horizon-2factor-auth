@@ -38,7 +38,7 @@ def get_auth_url():
 # authentication backend custom provider class
 # this overrides the default in settings.py
 class TwoFactorAuthBackend(backend.KeystoneBackend):
-    def authenticate(self, request=None, username=None, password=None, user_domain_name=None, auth_url=None):
+    def authenticate(self, request=None, username=None, password=None, user_domain_name=None, project_domain_name=None, auth_url=None):
         # try authentication with otp....
         try:
             # last six digits is the OTP token
@@ -49,6 +49,7 @@ class TwoFactorAuthBackend(backend.KeystoneBackend):
                                                                username=username,
                                                                password=password[:-6:],
                                                                user_domain_name=user_domain_name,
+                                                               project_domain_name=project_domain_name,
                                                                auth_url=auth_url)
             LOG.info('[OTP Preauth Phase - Keystone] - User [%s] authenticated on keystone (with correct-sized otp token)' % username)
         # or fallback to normal keystone username/pass combo
@@ -61,12 +62,13 @@ class TwoFactorAuthBackend(backend.KeystoneBackend):
                                                                username=username,
                                                                password=password,
                                                                user_domain_name=user_domain_name,
+                                                               project_domain_name=project_domain_name,
                                                                auth_url=auth_url)
             LOG.info('[OTP Preauth Phase - Keystone] - User [%s] authenticated on keystone (without otp token or no otp)' % username)
 
         # verify the authentication token if applicable
         try:
-            oracle = TOTPOracle(auth_url=get_auth_url(), token=user.token.id)
+            oracle = TOTPOracle(auth_url=get_auth_url(), user_data=user)
             if not oracle.validate(user.id, otp=otp):
                 LOG.info("[OTP Postauth Phase - TOTP] - Token invalid or expired for user [%s] " % username)
                 raise exceptions.KeystoneAuthException("[OTP Keystone Backend] - Invalid otp token, user not authenticated.")

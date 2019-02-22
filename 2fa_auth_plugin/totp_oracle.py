@@ -28,17 +28,23 @@ EMAIL_ATTRIBUTE = "email"
 # TOTP Token Oracle
 # This class does all verification work.
 class TOTPOracle(object):
-    def __init__(self, auth_url=None, token=None, username=None, password=None):
+    def __init__(self, auth_url=None, user_data=None, username=None, password=None, user_domain_name=None, project_domain_name=None, project_name=None):
         # sanity check. Either token or user/pass pair is needed to continue
-        if not (token or (username and password)):
+        if not (user_data or (username and password)):
             raise IllegalArgument("[TOTPOracle.__init__()]: One either of token or username/password are required")
 
         self.__auth_url = auth_url
-        if token:
-            self.__plugin = v3.Token(auth_url=self.__auth_url, token=token)
+        if user_data:
+            self.__plugin = v3.Token(auth_url=self.__auth_url,
+                                    token=user_data.token.id)
         else:
-            self.__plugin = v3.Password(auth_url=self.__auth_url, username=username, password=password,
-                                        user_domain_name="DEFAULT", reauthenticate=True)
+            self.__plugin = v3.Password(auth_url=self.__auth_url, 
+                                        username=username, 
+                                        password=password,
+                                        user_domain_name=user_domain_name,
+                                        project_domain_name=project_domain_name,
+                                        project_name=project_name,
+                                        reauthenticate=True)
 
     # get keystone client
     def __get_client(self):
