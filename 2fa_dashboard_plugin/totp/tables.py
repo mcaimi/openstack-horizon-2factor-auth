@@ -32,7 +32,7 @@ class ActivateLink(tables.LinkAction):
     icon = "plus"
 
     def allowed(self, request, datum):
-        has_email_set = TOTPOracle(auth_url=get_auth_url(), token=request.user.token.id).user_get_email_address(request.user.id)
+        has_email_set = TOTPOracle(auth_url=get_auth_url(), user_data=request.user).user_get_email_address(request.user.id)
 
         if self.table.data or (has_email_set == "None" or has_email_set is None):
             return False
@@ -46,8 +46,8 @@ class RegenerateQRCode(tables.LinkAction):
     icon = "plus"
 
     def allowed(self, request, datum):
-        has_email_set = TOTPOracle(auth_url=get_auth_url(), token=request.user.token.id).user_get_email_address(request.user.id)
-        has_token_set = TOTPOracle(auth_url=get_auth_url(), token=request.user.token.id).user_get_totp_key(request.user.id)
+        has_email_set = TOTPOracle(auth_url=get_auth_url(), user_data=request.user).user_get_email_address(request.user.id)
+        has_token_set = TOTPOracle(auth_url=get_auth_url(), user_data=request.user).user_get_totp_key(request.user.id)
 
         if (has_email_set == "None" or has_email_set is None) or (has_token_set == "None" or has_token_set is None):
             return False
@@ -78,7 +78,7 @@ class DeactivateLink(tables.DeleteAction):
         return True
 
     def delete(self, request, obj_id):
-        tokenmanager = TOTPOracle(auth_url=get_auth_url(), token=request.user.token.id)
+        tokenmanager = TOTPOracle(auth_url=get_auth_url(), user_data=request.user)
         tokenmanager.disable(request.user.id)
 
 

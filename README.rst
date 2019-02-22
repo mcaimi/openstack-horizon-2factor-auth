@@ -102,6 +102,19 @@ and in /etc/openstack-dashboard/local_settings:
   ACTIVATION_EMAIL_ADDRESS = "noreply@cloud-provider.tld"
   ACTIVATION_EMAIL_SUBJECT = "TOTP Activation Message"
 
+Openstack Queens and Later:
+---------------------------
+
+Fix Keystone policies to allow the token owner to update the user on keystone:
+
+..code::bash
+
+  # in /etc/openstack-dashboard/keystone_policy.json and in /etc/keystone/policy.json update the 'identity:update_user' policy to match this:
+
+  "identity:update_user": "rule:cloud_admin or rule:admin_and_matching_target_user_domain_id or rule:owner",
+
+the previous line uses policy.v3cloudsample.json as a base template. 
+
 Enable the newly installed dashboard
 ------------------------------------
 
