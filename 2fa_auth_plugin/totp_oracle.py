@@ -4,7 +4,8 @@
 #
 # Changelog
 #
-# - Tue Jul 25 - Initial porting to Horizon Mitaka - Marco Caimi <marco.caimi@fastweb.it>
+# - Tue Jul 25 2017 - Initial porting to Horizon Mitaka - Marco Caimi <marco.caimi@fastweb.it>
+# - Mon Nov 11 2019 - Porting to Openstack Stein. Move auth code from keystoneclient to keystoneauth1, drop support for keystone v2 - Marco Caimi <mcaimi@redhat.com>
 
 import logging
 
@@ -12,18 +13,24 @@ import logging
 from rfc6238 import totp
 
 # keystone client
-from keystoneclient import session as ksc_session
-from keystoneclient.auth.identity import v3
-from keystoneclient.v3 import client as client_v3
-from keystoneclient import auth
+from keystoneauth1.identity import v3 as v3_plugin
+from keystoneclient.v3 import client as v3_client
+from keystoneauth1 import session as keystone_session
 
-from exception import *
+# openstack dashboard api import
+from openstack_dashboard.api import base as api_base
+from openstack_dashboard.api import keystone
+
+from openstack_dashboard import settings
+from exception import IllegalArgument, InvalidToken, TOTPRuntimeError
 
 LOG = logging.getLogger(__name__)
+KS_VERSION = api_base.APIVersionManager('identity', preferred_version=3)
 
 # custom keystone property to read from the database
 TOTP_KEY_ATTRIBUTE = "totp_key"
 EMAIL_ATTRIBUTE = "email"
+OPENSTACK_HOST = getattr(settings, "OPENSTACK_HOST", None)
 
 # TOTP Token Oracle
 # This class does all verification work.
@@ -35,21 +42,26 @@ class TOTPOracle(object):
 
         self.__auth_url = auth_url
         if user_data:
-            self.__plugin = v3.Token(auth_url=self.__auth_url,
-                                    token=user_data.token.id)
+            LOG.info("using keystone v3.")
+            if OPENSTACK_HOST:
+                self.auth = v3_plugin.Token(auth_url="https://%s:5000/v3" % settings.OPENSTACK_HOST,
+                                        token=user_data.token.id,
+                                        project_id=user_data.project_id,
+                                        project_domain_id=user_data.domain_id)
+            else:
+                self.auth = v3_plugin.Token(auth_url=settings.OPENSTACK_KEYSTONE_URL, 
+                                        project_id=user_data.project_id, 
+                                        project_domain_id=user_data.domain_id, 
+                                        token=user_data.token.id)
+
+            # create a session
+            self.ks_session = keystone_session.Session(auth=self.auth)
         else:
-            self.__plugin = v3.Password(auth_url=self.__auth_url, 
-                                        username=username, 
-                                        password=password,
-                                        user_domain_name=user_domain_name,
-                                        project_domain_name=project_domain_name,
-                                        project_name=project_name,
-                                        reauthenticate=True)
+            raise TOTPRuntimeError("[TOTPOracle] user_data is missing in constructor")
 
     # get keystone client
     def __get_client(self):
-        session = ksc_session.Session(auth=self.__plugin)
-        return client_v3.Client(session=session, interface=auth.AUTH_INTERFACE)
+        return v3_client.Client(session=self.ks_session)
 
     # query keystone for user info
     def user_get(self, user_id):
