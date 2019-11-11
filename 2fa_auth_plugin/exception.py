@@ -5,3 +5,6 @@ class IllegalArgument(Exception):
 
 class InvalidToken(Exception):
     pass
+
+class TOTPRuntimeError(Exception):
+    pass
