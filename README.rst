@@ -11,6 +11,8 @@ more or less abandoned.
 The codebase was cleaned up and reworked in 2017 as we updated our Openstack installation 
 to the Mitaka Release and Newton afterwards.
 
+Current latest version supported is Stein (RHOSP 15)
+
 This version does not depend on external totp libraries and is implemented in pure python: 
 it was developed on RedHat's own Openstack distribution but it shoud work on any openstack
 horizon dashboard flavor.
@@ -35,14 +37,14 @@ Using a disposable centos/redhat vm or container:
 
   # yum install -y rpm-build git python-setuptools
   # mkdir -p ~/rpmbuild/{SRPMS,RPMS,SOURCES,SPECS} && cd ~/rpmbuild
-  # git clone https://github.com/mcaimi/python-otp-lib.git python-otp-lib-queens
-  # tar cjvf SOURCES/python-otp-lib-queens.tar.gz python-otp-lib-queens
+  # git clone https://github.com/mcaimi/python-otp-lib.git python-otp-lib-stein
+  # tar cjvf SOURCES/python-otp-lib-stein.tar.gz python-otp-lib-stein
 
 Now, copy the SPEC file from this repo in `~/rpmbuild/SPECS` and build the RPM package:
 
 .. code:: bash
 
-  # rpmbuild -bb SPECS/python-otp-lib-queens.spec
+  # rpmbuild -bb SPECS/python-otp-lib-stein.spec
 
 Install prerequisites (totp-lib, python-qrcode)
 -----------------------------------------------
@@ -53,7 +55,7 @@ install the RPM package just built before:
 .. code:: bash
 
   # yum install -y python-qrcode python-qrcode-core
-  # rpm -ivH python-otp-lib-mitaka-1.x86_64.rpm 
+  # rpm -ivH python-otp-lib-stein-1.x86_64.rpm 
 
 Install the TOTP Authentication Backend and Dashboard
 -----------------------------------------------------
@@ -80,6 +82,7 @@ set this parameters to change the authentication python class used by django:
 
 .. code:: python
 
+  TOTP_DEBUG = False
   AUTHENTICATION_BACKENDS = ('openstack_auth.backend.KeystoneBackend',)
 
 
@@ -107,13 +110,19 @@ Openstack Queens and Later:
 
 Fix Keystone policies to allow the token owner to update the user on keystone:
 
-..code::bash
+.. code:: bash
 
-  # in /etc/openstack-dashboard/keystone_policy.json and in /etc/keystone/policy.json update the 'identity:update_user' policy to match this:
+  # in /etc/openstack-dashboard/keystone_policy.json update the 'identity:update_user' policy to match this:
 
   "identity:update_user": "rule:cloud_admin or rule:admin_and_matching_target_user_domain_id or rule:owner",
 
-the previous line uses policy.v3cloudsample.json as a base template. 
+  # create a file under /etc/keystone/policy.d called update_user.json and insert these lines inside:
+
+  {
+    "identity:update_user": "rule:cloud_admin or rule:admin_and_matching_target_user_domain_id or rule:owner"
+  }
+
+the previous line uses policy.v3cloudsample.json as a base template (see the official keystone GitHub repo for that).
 
 Enable the newly installed dashboard
 ------------------------------------
