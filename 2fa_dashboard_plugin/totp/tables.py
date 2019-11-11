@@ -18,10 +18,12 @@ from django.utils.translation import ungettext_lazy
 
 from horizon import tables
 
+from openstack_dashboard import settings
 from openstack_dashboard.auth.backend import get_auth_url
 from openstack_dashboard.auth.totp_oracle import TOTPOracle
 
 LOG = logging.getLogger(__name__)
+DEBUG = getattr(settings, 'TOTP_DEBUG', False)
 
 # activate totp button link handler
 class ActivateLink(tables.LinkAction):
@@ -34,7 +36,7 @@ class ActivateLink(tables.LinkAction):
     def allowed(self, request, datum):
         has_email_set = TOTPOracle(auth_url=get_auth_url(), user_data=request.user).user_get_email_address(request.user.id)
 
-        if self.table.data or (has_email_set == "None" or has_email_set is None):
+        if (self.table.data or (has_email_set == "None" or has_email_set is None)) and not DEBUG:
             return False
         return True
 
@@ -49,7 +51,7 @@ class RegenerateQRCode(tables.LinkAction):
         has_email_set = TOTPOracle(auth_url=get_auth_url(), user_data=request.user).user_get_email_address(request.user.id)
         has_token_set = TOTPOracle(auth_url=get_auth_url(), user_data=request.user).user_get_totp_key(request.user.id)
 
-        if (has_email_set == "None" or has_email_set is None) or (has_token_set == "None" or has_token_set is None):
+        if ((has_email_set == "None" or has_email_set is None) or (has_token_set == "None" or has_token_set is None)) and not DEBUG:
             return False
         return True
 

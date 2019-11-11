@@ -2,19 +2,7 @@
 {% load i18n %}
 
 {% block modal-header %}
-<h2>Activate Token</h2>
-{% if form.email_address.value == "MissingField" %}
-    <p/>
-    <p/><p/>
-    <div class="panel panel-error">
-      <div class="panel-heading">
-        <h3 class="panel-title">Two Factor Auth Plugin</h3>
-      </div>
-      <div class="panel-body"><h4>Internal server error. This incident has been logged.</h4></div>
-    </div>
-    <p/>
-
-{% else %}
+<h2>Register A New Soft Token</h2>
     <p/>
     <div align="center"><span class="label label-info">Please scan this QRCode to add a new soft-token.</span></div>
     <p/>
@@ -26,7 +14,5 @@
       </div>
       <div class="panel-body"><h5>If you have problems with authentication/verification, make sure your device time is synced with an NTP server and let 30 seconds pass before retrying.</h5></div>
     </div>
-
-{% endif %}
 {% endblock %}
 
