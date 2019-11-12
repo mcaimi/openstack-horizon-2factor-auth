@@ -30,7 +30,7 @@ KS_VERSION = api_base.APIVersionManager('identity', preferred_version=3)
 # custom keystone property to read from the database
 TOTP_KEY_ATTRIBUTE = "totp_key"
 EMAIL_ATTRIBUTE = "email"
-OPENSTACK_HOST = getattr(settings, "OPENSTACK_HOST", None)
+KEYSTONE_URL = getattr(settings, "OPENSTACK_KEYSTONE_URL", None)
 
 # TOTP Token Oracle
 # This class does all verification work.
@@ -42,17 +42,14 @@ class TOTPOracle(object):
 
         self.__auth_url = auth_url
         if user_data:
-            LOG.info("using keystone v3.")
-            if OPENSTACK_HOST:
-                self.auth = v3_plugin.Token(auth_url="https://%s:5000/v3" % settings.OPENSTACK_HOST,
-                                        token=user_data.token.id,
-                                        project_id=user_data.project_id,
-                                        project_domain_id=user_data.domain_id)
-            else:
+            LOG.info("[TOTP]: using keystone v3.")
+            if KEYSTONE_URL:
                 self.auth = v3_plugin.Token(auth_url=settings.OPENSTACK_KEYSTONE_URL, 
                                         project_id=user_data.project_id, 
                                         project_domain_id=user_data.domain_id, 
                                         token=user_data.token.id)
+            else:
+                raise TOTPRuntimeError("[TOTPOracle.__init__()]: Missing OPENSTACK_KEYSTONE_URL or OPENSTACK_HOST in Horizon local_settings")
 
             # create a session
             self.ks_session = keystone_session.Session(auth=self.auth)
