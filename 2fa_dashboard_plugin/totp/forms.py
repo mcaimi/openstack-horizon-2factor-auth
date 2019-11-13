@@ -40,17 +40,20 @@ class ActivateTwoFactorForm(forms.SelfHandlingForm):
     def __init__(self, request, *args, **kwargs):
         super(ActivateTwoFactorForm, self).__init__(request, *args, **kwargs)
         v_seed = kwargs.get('data', {}).get('seed')
+        email = TOTPOracle(auth_url=get_auth_url(), user_data=request.user).user_get_email_address(request.user.id)
+
         if not v_seed:
             v_seed = totp.get_random_base32_key(byte_key=16)
             kwargs.get('initial', {})['seed'] = v_seed
-
-        email = TOTPOracle(auth_url=get_auth_url(), user_data=request.user).user_get_email_address(request.user.id)
-
-        if (email == "") or (email == "None") or (email is None):
-            email = "MissingField"
-        else:
-            # send email...
-            send_activation_email(sender=getattr(settings, 'ACTIVATION_EMAIL_ADDRESS', 'activation@provider.tld'), recipient=email, subject=getattr(settings, 'ACTIVATION_EMAIL_SUBJECT', 'TOTP Activation'), totp_token=v_seed, request=request)
+            if (email == "") or (email == "None") or (email is None):
+                email = "MissingField"
+            else:
+                # send email...
+                 send_activation_email(sender=getattr(settings, 'ACTIVATION_EMAIL_ADDRESS', 'activation@provider.tld'), 
+                                        recipient=email, 
+                                        subject=getattr(settings, 'ACTIVATION_EMAIL_SUBJECT', 'TOTP Activation'), 
+                                        totp_token=v_seed, 
+                                        request=request)
 
         self.fields['seed'].initial = v_seed
         self.fields['email_address'].initial = email
