@@ -31,6 +31,7 @@ KS_VERSION = api_base.APIVersionManager('identity', preferred_version=3)
 TOTP_KEY_ATTRIBUTE = "totp_key"
 EMAIL_ATTRIBUTE = "email"
 KEYSTONE_URL = getattr(settings, "OPENSTACK_KEYSTONE_URL", None)
+TOTP_TTL = getattr(settings, "TOTP_VALIDITY_PERIOD", 30)
 
 # TOTP Token Oracle
 # This class does all verification work.
@@ -103,7 +104,7 @@ class TOTPOracle(object):
             raise InvalidToken("[TOTPOracle.validate()] - Invalid token")
 
         # calculate totp token
-        totp_token = totp.TOTP(key)
+        totp_token = totp.TOTP(key, timestep=TOTP_TTL)
 
         # check and return
         return (str(otp) == str(totp_token))

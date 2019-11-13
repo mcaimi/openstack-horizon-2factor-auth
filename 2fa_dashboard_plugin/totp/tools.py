@@ -8,6 +8,8 @@ from openstack_dashboard import settings
 from django.http import HttpResponse
 from horizon import exceptions
 
+TOTP_TTL = getattr(settings, "TOTP_VALIDITY_PERIOD", 30)
+
 # generate html response with QR code to allow the user to sync mobile token generators
 def qr(request, token_seed=None, html_encode=True):
     """
@@ -18,9 +20,9 @@ def qr(request, token_seed=None, html_encode=True):
         raise exceptions.HorizonException
 
     # compute token...
-    token = totp.TOTP(token_seed)
-    provisioning_prefix = getattr(settings, 'OPENSTACK_TWO_FACTOR_PROVISIONING', '')
-    provisioning_uri = totp.build_uri(secret=token_seed, name=request.user.username)
+    #token = totp.TOTP(token_seed)
+    #provisioning_prefix = getattr(settings, 'OPENSTACK_TWO_FACTOR_PROVISIONING', '')
+    provisioning_uri = totp.build_uri(secret=token_seed, name=request.user.username, period=TOTP_TTL)
     qrCodeImage = qrcode.make(provisioning_uri)
     img = StringIO()
     qrCodeImage.save(img)
