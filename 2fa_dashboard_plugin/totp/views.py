@@ -65,7 +65,7 @@ class IndexView(tables.DataTableView):
             if totp_key and not ((totp_key == "None") or (totp_key is None)):
                 objects.append(TwoFactorData(self.request.user.id, self.request.user.username, totp_key, True, email))
         except:
-            objects = []
+            objects = [] 
 
         return objects
 
@@ -85,7 +85,7 @@ class RegenerateView(forms.ModalFormView):
     modal_header = _("Add a TOTP SoftToken")
     form_id = "regenerate_totp_form"
     form_class = totp_forms.RegenerateTwoFactorForm
-    submit_label = _("")
+    submit_label = _("Close")
     action_url = None
     submit_url = reverse_lazy("horizon:identity:totp:regenerate")
     success_url = reverse_lazy('horizon:identity:totp:index')
