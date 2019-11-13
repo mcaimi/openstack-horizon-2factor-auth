@@ -83,6 +83,7 @@ set this parameters to change the authentication python class used by django:
 .. code:: python
 
   TOTP_DEBUG = False
+  TOTP_VALIDITY_PERIOD = 60
   AUTHENTICATION_BACKENDS = ('openstack_auth.backend.KeystoneBackend',)
 
 
