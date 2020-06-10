@@ -55,7 +55,14 @@ class TOTPOracle(object):
             # create a session
             self.ks_session = keystone_session.Session(auth=self.auth)
         else:
-            raise TOTPRuntimeError("[TOTPOracle] user_data is missing in constructor")
+            LOG.info("[TOTP] using keystone v3 with username/password pair")
+            self.auth = v3_plugin.Password(auth_url=auth_url, username=username, password=password, 
+                                            project_name = project_name,
+                                            project_domain_name = project_domain_name,
+                                            user_domain_name=user_domain_name)
+            
+            # build session
+            self.ks_session = keystone_session.Session(auth=self.auth)
 
     # get keystone client
     def __get_client(self):
