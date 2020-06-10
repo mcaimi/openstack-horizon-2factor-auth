@@ -11,7 +11,11 @@ more or less abandoned.
 The codebase was cleaned up and reworked in 2017 as we updated our Openstack installation 
 to the Mitaka Release and Newton afterwards.
 
-Current latest version supported is Stein (RHOSP 15)
+The master branch is developed on top of RDO latest release (currently this is "Ussuri").
+The latest environment makes use of:
+
+- RHEL/CentOS 8.x Branch
+- Python 3.6+
 
 This version does not depend on external totp libraries and is implemented in pure python: 
 it was developed on RedHat's own Openstack distribution but it shoud work on any openstack
@@ -31,20 +35,26 @@ These are the basic installation steps for Openstack Horizon:
 
 First you have to build an RPM package from the totp-lib submodule in the git project.
 
-Using a disposable centos/redhat vm or container:
+On CentOS 8, set the default interpreter to the local python3 version:
 
 .. code:: bash
 
-  # yum install -y rpm-build git python-setuptools
+  # alternatives --set python /usr/bin/python3
+
+And then build the otp-lib package:
+
+.. code:: bash
+
+  # dnf install -y rpm-build git python-setuptools-wheel python3-setuptools-wheel
   # mkdir -p ~/rpmbuild/{SRPMS,RPMS,SOURCES,SPECS} && cd ~/rpmbuild
-  # git clone https://github.com/mcaimi/python-otp-lib.git python-otp-lib-stein
-  # tar cjvf SOURCES/python-otp-lib-stein.tar.gz python-otp-lib-stein
+  # git clone https://github.com/mcaimi/python-otp-lib.git python-otp-lib-ussuri
+  # tar cjvf SOURCES/python-otp-lib-ussuri-1.tar.gz python-otp-lib-ussuri
 
 Now, copy the SPEC file from this repo in `~/rpmbuild/SPECS` and build the RPM package:
 
 .. code:: bash
 
-  # rpmbuild -bb SPECS/python-otp-lib-stein.spec
+  # rpmbuild -bb SPECS/python-otp-lib-ussuri.spec
 
 Install prerequisites (totp-lib, python-qrcode)
 -----------------------------------------------
@@ -54,8 +64,8 @@ install the RPM package just built before:
 
 .. code:: bash
 
-  # yum install -y python-qrcode python-qrcode-core
-  # rpm -ivH python-otp-lib-stein-1.x86_64.rpm 
+  # dnf install -y python3-qrcode python3-qrcode-core
+  # rpm -ivH python-otp-lib-ussuri-1.x86_64.rpm 
 
 Install the TOTP Authentication Backend and Dashboard
 -----------------------------------------------------
@@ -83,7 +93,7 @@ set this parameters to change the authentication python class used by django:
 .. code:: python
 
   TOTP_DEBUG = False
-  TOTP_VALIDITY_PERIOD = 60
+  TOTP_VALIDITY_PERIOD = 30
   AUTHENTICATION_BACKENDS = ('openstack_auth.backend.KeystoneBackend',)
 
 
@@ -109,18 +119,28 @@ and in /etc/openstack-dashboard/local_settings:
 Openstack Queens and Later:
 ---------------------------
 
+Set up keystone policies directory if not already done:
+
+.. code:: bash
+
+  # under /etc/keystone/keystone.conf
+  policies_dir = /etc/keystone/policy.d
+
+  # create directory
+  $ mkdir -p /etc/keystone/policy.d
+
 Fix Keystone policies to allow the token owner to update the user on keystone:
 
 .. code:: bash
 
   # in /etc/openstack-dashboard/keystone_policy.json update the 'identity:update_user' policy to match this:
 
-  "identity:update_user": "rule:cloud_admin or rule:admin_and_matching_target_user_domain_id or rule:owner",
+  "identity:update_user": "rule:admin_required or rule:admin_and_matching_target_user_domain_id or rule:owner",
 
   # create a file under /etc/keystone/policy.d called update_user.json and insert these lines inside:
 
   {
-    "identity:update_user": "rule:cloud_admin or rule:admin_and_matching_target_user_domain_id or rule:owner"
+    "identity:update_user": "rule:admin_required or rule:admin_and_matching_target_user_domain_id or rule:owner"
   }
 
 the previous line uses policy.v3cloudsample.json as a base template (see the official keystone GitHub repo for that).
