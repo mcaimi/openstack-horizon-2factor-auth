@@ -6,6 +6,7 @@
 #
 # - Tue Jul 25 2017 - Initial porting to Horizon Mitaka - Marco Caimi <marco.caimi@fastweb.it>
 # - Mon Nov 11 2019 - Porting to Openstack Stein. Move auth code from keystoneclient to keystoneauth1, drop support for keystone v2 - Marco Caimi <mcaimi@redhat.com>
+# - Tue Jun 09 2020 - Porting to Openstack Ussuri. - Marco Caimi <mcaimi@redhat.com>
 
 import logging
 
@@ -22,7 +23,7 @@ from openstack_dashboard.api import base as api_base
 from openstack_dashboard.api import keystone
 
 from openstack_dashboard import settings
-from exception import IllegalArgument, InvalidToken, TOTPRuntimeError
+from openstack_dashboard.auth.exception import IllegalArgument, InvalidToken, TOTPRuntimeError
 
 LOG = logging.getLogger(__name__)
 KS_VERSION = api_base.APIVersionManager('identity', preferred_version=3)
@@ -111,7 +112,7 @@ class TOTPOracle(object):
 
     # enable totp by saveing the totp key in keystone
     def enable(self, user_id, key, otp):
-        t = totp.TOTP(key)
+        t = totp.TOTP(key, timestep=TOTP_TTL)
         if not (str(t) == str(otp)):
             raise InvalidToken("[TOTPOracle.enable()] - Token error")
 

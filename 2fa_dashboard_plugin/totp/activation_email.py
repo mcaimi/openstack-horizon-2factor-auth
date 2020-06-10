@@ -5,7 +5,10 @@ import logging
 from django.core.mail import EmailMultiAlternatives
 from django.template.loader import render_to_string
 from openstack_dashboard.dashboards.identity.totp.tools import qr
-from email.MIMEImage import MIMEImage
+try:
+    from email.MIMEImage import MIMEImage
+except:
+    from email.mime.image import MIMEImage
 
 LOG = logging.getLogger(__name__)
 

@@ -3,7 +3,11 @@
 #
 import qrcode
 from rfc6238 import totp
-from StringIO import StringIO
+try:
+    from StringIO import StringIO
+except:
+    from io import BytesIO
+
 from openstack_dashboard import settings
 from django.http import HttpResponse
 from horizon import exceptions
@@ -24,7 +28,7 @@ def qr(request, token_seed=None, html_encode=True):
     #provisioning_prefix = getattr(settings, 'OPENSTACK_TWO_FACTOR_PROVISIONING', '')
     provisioning_uri = totp.build_uri(secret=token_seed, name=request.user.username, period=TOTP_TTL)
     qrCodeImage = qrcode.make(provisioning_uri)
-    img = StringIO()
+    img = BytesIO()
     qrCodeImage.save(img)
     img.seek(0)
 
