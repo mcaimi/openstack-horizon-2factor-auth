@@ -156,3 +156,45 @@ Lastly, enable the dashboard:
   # restorecon -Rv /usr/share/openstack-dashboard
   # systemctl restart httpd
 
+Disabling a TOTP key for a single user
+--------------------------------------
+
+As of now there is no easy way for an user to recover a lost token. Admins can, as a workaround, disable a provisioned token on demand.
+The totp_disable command is provided for the Django management shell:
+
+.. code:: bash
+
+  $ cp totp_disable.py /usr/share/openstack-dashboard/openstack_dashboard/management/commands/
+  $ restorecon -Rv /usr/share/openstack-dashboard
+
+This allows for and Admin to disable totp provisioned tokens for single users:
+
+.. code:: bash
+
+  $ cd /usr/share/openstack-dashboard
+  
+  # source the keystonerc file for the Openstack Admin user
+  $ source ~/keystonerc-admin
+
+  # get the user ID for a particular user
+  $ openstack user show demouser
+  +----------------------------------+------------+
+  | ID                               | Name       |
+  +----------------------------------+------------+
+  | d0bd9f7c1f104ed3924b283d63d734d7 | admin      |
+  | 21b26a2d0daa49609510d032e22a5202 | glance     |
+  | a38cbd05a4a04a908b62158c6bb0dc1c | cinder     |
+  | 19e1cfbdf4674a7e9f5796a8135f4da4 | nova       |
+  | 3537c768427d46279c265b87bf1c0413 | placement  |
+  | 77c7fd3cef744d719812d285673c26cd | neutron    |
+  | 6b44bed7a49f40adb10e369f75244f5a | swift      |
+  | 03a010c254e54b43b370c7a200d517df | gnocchi    |
+  | 73d010772e694b159d00935255205f25 | ceilometer |
+  | 5e576ec671e541939e8b211f4269fb9c | aodh       |
+  | 96e0e23ca7b7499e982f1773ff0330e1 | demouser   |
+  +----------------------------------+------------+
+
+  # disable the totp feature for user demouser
+  $ ./manage.py totp_disable --user-id 96e0e23ca7b7499e982f1773ff0330e1
+
+
