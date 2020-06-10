@@ -55,7 +55,7 @@ class ActivateTwoFactorForm(forms.SelfHandlingForm):
                                         totp_token=v_seed, 
                                         request=request)
 
-        self.fields['seed'].initial = v_seed
+        self.fields['seed'].initial = v_seed if (type(v_seed) == str) else v_seed.decode('utf-8')
         self.fields['email_address'].initial = email
 
     def handle(self, request, data):

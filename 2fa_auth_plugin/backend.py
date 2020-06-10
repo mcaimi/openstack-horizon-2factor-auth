@@ -17,12 +17,12 @@
 """ Module defining the Django auth backend class for the Two Factor API. """
 
 import logging
-import urlparse
+from urllib.parse import urljoin
 
 from openstack_auth import backend
 from openstack_auth import exceptions
 
-from totp_oracle import TOTPOracle
+from openstack_dashboard.auth.totp_oracle import TOTPOracle
 from openstack_dashboard import settings
 
 LOG = logging.getLogger(__name__)
@@ -33,7 +33,7 @@ KEYSTONE_CLIENT_ATTR = "_keystoneclient"
 def get_auth_url():
     auth_url = getattr(settings, 'OPENSTACK_KEYSTONE_URL')
     auth_url = auth_url.rstrip('/')
-    return urlparse.urljoin(auth_url, 'v3')
+    return urljoin(auth_url, 'v3')
 
 # authentication backend custom provider class
 # this overrides the default in settings.py
@@ -76,4 +76,4 @@ class TwoFactorAuthBackend(backend.KeystoneBackend):
             LOG.info("[OTP Postauth Phase - TOTP] - Token for user [%s] is valid: Authentication Complete" % username)
             return user
         except Exception as e:
-            raise exceptions.KeystoneAuthException(e.message)
+            raise exceptions.KeystoneAuthException(e)
