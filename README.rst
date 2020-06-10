@@ -177,7 +177,7 @@ This allows for and Admin to disable totp provisioned tokens for single users:
   $ source ~/keystonerc-admin
 
   # get the user ID for a particular user
-  $ openstack user show demouser
+  $ openstack user list
   +----------------------------------+------------+
   | ID                               | Name       |
   +----------------------------------+------------+
