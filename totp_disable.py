@@ -108,7 +108,6 @@ class Command(base.BaseCommand):
                             help='Specify the user id for which TOTP must be disabled')
 
     def handle(self, *args, **options):
-        print(options)
         self.conn_values_check(options)
         if options.get('user_id') is not None:
             self.disable(options)
