@@ -26,6 +26,7 @@ def env(*vars, **kwargs):
 
 class Command(base.BaseCommand):
     def __init__(self, parser_class=argparse.ArgumentParser):
+        super(Command, self).__init__()
         self.parser_class = parser_class
 
     def conn_values_check(self, options):
