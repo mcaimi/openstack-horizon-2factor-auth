@@ -92,8 +92,6 @@ set this parameters to change the authentication python class used by django:
 
 .. code:: python
 
-  TOTP_DEBUG = False
-  TOTP_VALIDITY_PERIOD = 30
   AUTHENTICATION_BACKENDS = ('openstack_auth.backend.KeystoneBackend',)
 
 
@@ -103,7 +101,14 @@ with
 
   AUTHENTICATION_BACKENDS =('openstack_dashboard.auth.backend.TwoFactorAuthBackend',)
 
-and in /etc/openstack-dashboard/local_settings:
+also, make sure that these parameters are set:
+
+.. code:: python
+
+  TOTP_DEBUG = False
+  TOTP_VALIDITY_PERIOD = 30
+
+Lastly setup these parameters in /etc/openstack-dashboard/local_settings:
 
 .. code:: python
 
@@ -124,7 +129,7 @@ Set up keystone policies directory if not already done:
 .. code:: bash
 
   # under /etc/keystone/keystone.conf
-  policies_dir = /etc/keystone/policy.d
+  policy_dirs = /etc/keystone/policy.d
 
   # create directory
   $ mkdir -p /etc/keystone/policy.d
